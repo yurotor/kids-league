@@ -471,9 +471,57 @@ footer .balls { font-size: 20px; letter-spacing: 6px; }
   font-weight: 600;
 }
 
+/* ===== מובייל ===== */
 @media (max-width: 560px) {
-  table.games { font-size: 13px; }
-  table.games thead th { font-size: 12px; padding: 8px 4px; }
-  table.games tbody td { padding: 8px 4px; }
-  .score-input { width: 42px; }
+  body { overflow-x: hidden; }
+
+  .topbar { padding: 10px 12px; gap: 8px; }
+  .crest { width: 40px; height: 44px; font-size: 18px; }
+  .brand { gap: 9px; }
+  .brand-text p { font-size: 11px; }
+  .nav-links { gap: 6px; width: 100%; justify-content: center; flex-wrap: wrap; }
+  .nav-links a { font-size: 13px; padding: 6px 12px; }
+
+  .wrap { padding-top: 16px; }
+  .chip { font-size: 14px; padding: 8px 16px; }
+  .filter { min-width: 100%; max-width: 100%; }
+
+  .round-head { padding: 10px 12px; gap: 6px; }
+  .round-head .round-name { font-size: 16px; }
+  .round-head .round-meta { font-size: 12px; }
+
+  table.games { font-size: 12.5px; }
+  table.games thead th { font-size: 11.5px; padding: 8px 3px; }
+  table.games tbody td { padding: 8px 3px; }
+  td.teams-cell .vs { padding: 0 3px; font-size: 11px; }
+  .score-pill { font-size: 12.5px; padding: 2px 9px; }
+  .pending { font-size: 11.5px; }
+
+  /* טבלאות דחוסות שנכנסות במסך צר; אם בכל זאת צר מדי — גלילה בתוך הכרטיס במקום חיתוך */
+  .group-card, .round-card { overflow-x: auto; }
+
+  /* חלוקת עמודות קבועה כדי שהטבלה תמיד תיכנס ברוחב המסך */
+  table.games { table-layout: fixed; }
+  #schedule table.games th:nth-child(1) { width: 19%; }
+  #schedule table.games th:nth-child(2) { width: 9%; }
+  #schedule table.games th:nth-child(4) { width: 24%; }
+  #adminSchedule table.games th:nth-child(1) { width: 16%; }
+  #adminSchedule table.games th:nth-child(2) { width: 8%; }
+  #adminSchedule table.games th:nth-child(4) { width: 33%; }
+  #adminSchedule table.games th:nth-child(5) { width: 15%; }
+  #adminSchedule .clear-btn { padding: 5px 8px; font-size: 11.5px; }
+  #adminSchedule .score-input { width: 38px; padding: 6px 2px; }
+  td.teams-cell { overflow-wrap: break-word; }
+  table.standings { font-size: 11.5px; }
+  table.standings thead th { font-size: 10.5px; padding: 6px 2px; }
+  table.standings td { padding: 6px 2px; }
+  table.standings td.team-name { padding-right: 6px; }
+  .group-head { font-size: 15px; padding: 9px 12px; }
+
+  .admin-toolbar { position: static; padding: 12px 14px; gap: 8px; }
+  .save-note { font-size: 11.5px; }
+  .score-input { width: 42px; font-size: 15px; }
+
+  .hero-title { margin-top: 0; }
+  .cal-item { min-width: 96px; padding: 7px 10px; }
 }

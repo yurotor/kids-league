@@ -37,7 +37,7 @@ function renderAdminSchedule() {
       return `
       <tr data-game="${g.id}">
         <td>${esc(g.time)}</td>
-        <td>מגרש ${g.pitch}</td>
+        <td>${g.pitch}</td>
         <td class="teams-cell">${esc(g.home)}<span class="vs">נגד</span>${esc(g.away)}</td>
         <td style="white-space:nowrap">
           <input class="score-input" type="number" min="0" inputmode="numeric" data-side="h" value="${h}" aria-label="תוצאת ${esc(g.home)}">

@@ -158,7 +158,7 @@ function renderSchedule(cls, results, roundFilter = "all", teamFilter = "all") {
     const rows = games.map(g => `
       <tr>
         <td>${esc(g.time)}</td>
-        <td>מגרש ${g.pitch}</td>
+        <td>${g.pitch}</td>
         <td class="teams-cell">${esc(g.home)}<span class="vs">נגד</span>${esc(g.away)}</td>
         <td>${scoreCell(g, results)}</td>
       </tr>`).join("");
