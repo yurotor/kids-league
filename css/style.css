@@ -1,0 +1,479 @@
+/* ליגת ראש העיר 2026 — עיצוב בהשראת הפליירים הרשמיים */
+
+:root {
+  --purple-dark: #6d5399;      /* כותרות טבלה */
+  --purple-mid: #8a6fb5;
+  --purple-row-a: #cdc0e0;     /* שורה כהה */
+  --purple-row-b: #e9e3f2;     /* שורה בהירה */
+  --pink: #e91e8c;             /* פס ורוד */
+  --pink-soft: #f9d5ea;
+  --lilac-banner: #d9c8e8;     /* באנר סגלגל של כותרת המחזור */
+  --ink: #1d1d22;
+  --paper: #f2f0f4;
+  --card: #ffffff;
+  --green: #1d9e57;
+  --radius: 14px;
+  --shadow: 0 10px 30px rgba(60, 40, 100, 0.14);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: "Heebo", "Rubik", "Segoe UI", Arial, sans-serif;
+  direction: rtl;
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse 900px 500px at 110% -5%, rgba(233, 30, 140, 0.10), transparent 60%),
+    radial-gradient(ellipse 800px 480px at -10% 108%, rgba(109, 83, 153, 0.14), transparent 60%),
+    var(--paper);
+  min-height: 100vh;
+}
+
+/* ===== פס עליון ===== */
+.topbar {
+  background: linear-gradient(90deg, #f8f7fa 0%, #efeaf6 100%);
+  border-bottom: 4px solid var(--pink);
+  padding: 14px clamp(14px, 4vw, 44px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.brand { display: flex; align-items: center; gap: 14px; }
+
+.crest {
+  width: 54px; height: 60px;
+  background: linear-gradient(180deg, #4fb3e8 55%, #7f5bb5 100%);
+  clip-path: polygon(0 0, 100% 0, 100% 68%, 50% 100%, 0 68%);
+  display: grid; place-items: center;
+  color: #fff; font-size: 26px;
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,.25));
+}
+
+.brand-text h1 {
+  font-size: clamp(20px, 3.4vw, 30px);
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+
+.brand-text h1 .year { color: var(--pink); }
+
+.brand-text p { font-size: 13px; color: #6d6580; font-weight: 500; }
+
+.nav-links { display: flex; gap: 10px; }
+
+.nav-links a {
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--purple-dark);
+  background: #fff;
+  border: 2px solid var(--purple-row-a);
+  border-radius: 999px;
+  padding: 8px 18px;
+  transition: all .15s ease;
+}
+
+.nav-links a:hover, .nav-links a.active {
+  background: var(--purple-dark);
+  border-color: var(--purple-dark);
+  color: #fff;
+}
+
+.nav-links a.admin-link { border-color: var(--pink-soft); color: var(--pink); }
+.nav-links a.admin-link:hover { background: var(--pink); border-color: var(--pink); color: #fff; }
+
+/* ===== גוף העמוד ===== */
+.wrap { max-width: 1080px; margin: 0 auto; padding: 26px clamp(12px, 3vw, 30px) 70px; }
+
+.hero-title {
+  text-align: center;
+  font-size: clamp(30px, 6vw, 52px);
+  font-weight: 900;
+  margin: 8px 0 4px;
+}
+
+.hero-sub {
+  text-align: center;
+  display: inline-block;
+  background: var(--lilac-banner);
+  color: #5c3e86;
+  font-weight: 800;
+  font-size: clamp(15px, 2.6vw, 20px);
+  padding: 7px 26px;
+  border-radius: 10px;
+}
+
+.hero-sub-holder { text-align: center; margin-bottom: 26px; }
+
+/* ===== לו"ז טורניר ===== */
+.calendar-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 2px 14px;
+  margin-bottom: 22px;
+  scrollbar-width: thin;
+}
+
+.cal-item {
+  flex: 0 0 auto;
+  background: #201d26;
+  color: #fff;
+  border-radius: 10px;
+  padding: 8px 14px;
+  text-align: center;
+  min-width: 108px;
+  border-bottom: 3px solid var(--purple-mid);
+}
+
+.cal-item.knockout { border-bottom-color: var(--pink); }
+.cal-item.ceremony { border-bottom-color: #f5c518; }
+
+.cal-item .cal-label { font-weight: 800; font-size: 14px; }
+.cal-item .cal-date { font-size: 13px; color: #e8ddf5; font-weight: 600; }
+.cal-item .cal-venue { font-size: 11px; color: #b9aed0; }
+
+/* ===== בחירת כיתה ===== */
+.class-picker {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+  margin-bottom: 26px;
+}
+
+.class-picker h2 {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--purple-dark);
+  margin-bottom: 12px;
+}
+
+.class-chips { display: flex; flex-wrap: wrap; gap: 9px; }
+
+.filters-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 2px dashed var(--purple-row-b);
+}
+
+.filter { display: flex; flex-direction: column; gap: 6px; min-width: 220px; flex: 1; max-width: 340px; }
+
+.filter label { font-size: 13px; font-weight: 800; color: var(--purple-dark); }
+
+.filter select {
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  color: #3d2f57;
+  padding: 9px 12px;
+  border: 2px solid var(--purple-row-a);
+  border-radius: 10px;
+  background: #faf9fc;
+  cursor: pointer;
+}
+
+.filter select:focus { outline: none; border-color: var(--pink); }
+
+.chip {
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  padding: 9px 22px;
+  border-radius: 999px;
+  border: 2px solid var(--purple-row-a);
+  background: var(--purple-row-b);
+  color: #56437a;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+.chip:hover { transform: translateY(-2px); border-color: var(--purple-mid); }
+
+.chip.active {
+  background: linear-gradient(135deg, var(--pink) 0%, #b03be0 100%);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(233, 30, 140, .35);
+}
+
+/* ===== כרטיסי מחזור ===== */
+.section-title {
+  font-size: clamp(22px, 4vw, 30px);
+  font-weight: 900;
+  margin: 34px 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title::after {
+  content: "";
+  flex: 1;
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--pink), transparent);
+}
+
+.round-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 22px;
+  overflow: hidden;
+}
+
+.round-head {
+  background: var(--lilac-banner);
+  padding: 12px 18px;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.round-head .round-name { font-size: 19px; font-weight: 900; color: #4c3573; }
+.round-head .round-meta { font-size: 14px; font-weight: 600; color: #6d5a8c; }
+
+table.games {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+table.games thead th {
+  background: var(--purple-dark);
+  color: #fff;
+  font-weight: 800;
+  padding: 10px 8px;
+  font-size: 14px;
+}
+
+table.games tbody td {
+  padding: 10px 8px;
+  text-align: center;
+  font-weight: 600;
+}
+
+table.games tbody tr:nth-child(odd) { background: var(--purple-row-b); }
+table.games tbody tr:nth-child(even) { background: var(--purple-row-a); }
+
+td.teams-cell { font-weight: 700; }
+td.teams-cell .vs { color: #8a7fa3; font-weight: 500; padding: 0 6px; font-size: 13px; }
+
+.score-pill {
+  display: inline-block;
+  direction: ltr;
+  background: #201d26;
+  color: #fff;
+  font-weight: 900;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.pending { color: #97909f; font-size: 13px; font-weight: 600; }
+
+.winner { color: var(--green); }
+
+/* ===== טבלאות בתים ===== */
+.tables-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.group-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.group-head {
+  background: linear-gradient(135deg, var(--pink) 0%, #b03be0 100%);
+  color: #fff;
+  font-weight: 900;
+  font-size: 17px;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.group-head .cls-tag {
+  background: rgba(255,255,255,.22);
+  border-radius: 8px;
+  padding: 2px 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+table.standings { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+table.standings thead th {
+  background: var(--purple-dark);
+  color: #fff;
+  padding: 7px 4px;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+table.standings td {
+  text-align: center;
+  padding: 7px 4px;
+  font-weight: 600;
+}
+
+table.standings td.team-name { text-align: right; padding-right: 10px; font-weight: 700; }
+
+table.standings tbody tr:nth-child(odd) { background: var(--purple-row-b); }
+table.standings tbody tr:nth-child(even) { background: var(--purple-row-a); }
+
+table.standings tbody tr:first-child td:first-child { color: var(--pink); }
+
+td.pts { font-weight: 900; color: #4c3573; }
+
+/* ===== עמוד ניהול ===== */
+.login-box {
+  max-width: 380px;
+  margin: 60px auto;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 30px;
+  text-align: center;
+}
+
+.login-box h2 { font-weight: 900; margin-bottom: 4px; }
+.login-box p { color: #7a7288; font-size: 14px; margin-bottom: 18px; }
+
+.login-box input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 16px;
+  padding: 11px 14px;
+  margin-bottom: 12px;
+  border: 2px solid var(--purple-row-a);
+  border-radius: 10px;
+  background: #faf9fc;
+}
+
+.login-box input:focus { outline: none; border-color: var(--purple-mid); }
+
+.btn {
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  border: none;
+  border-radius: 999px;
+  padding: 11px 28px;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--pink) 0%, #b03be0 100%);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(233, 30, 140, .35);
+}
+
+.btn-primary:hover { transform: translateY(-2px); }
+
+.btn-dark { background: #201d26; color: #fff; }
+.btn-ghost { background: #fff; border: 2px solid var(--purple-row-a); color: var(--purple-dark); }
+.btn-ghost:hover { border-color: var(--purple-mid); }
+.btn-sm { font-size: 13px; padding: 6px 14px; }
+
+.login-error { color: #d32f2f; font-size: 14px; font-weight: 700; min-height: 20px; margin-top: 8px; }
+
+.admin-toolbar {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 10px;
+  z-index: 20;
+}
+
+.admin-toolbar .spacer { flex: 1; }
+
+.save-note { font-size: 13px; color: #6d6580; font-weight: 600; }
+
+.score-input {
+  width: 52px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  text-align: center;
+  padding: 6px 4px;
+  border: 2px solid var(--purple-row-a);
+  border-radius: 8px;
+  background: #fff;
+  direction: ltr;
+}
+
+.score-input:focus { outline: none; border-color: var(--pink); }
+
+.score-sep { font-weight: 900; padding: 0 6px; color: #6d5399; }
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 50%;
+  transform: translateX(50%);
+  background: #201d26;
+  color: #fff;
+  font-weight: 700;
+  padding: 12px 26px;
+  border-radius: 999px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+  z-index: 100;
+}
+
+.toast.show { opacity: 1; }
+
+/* ===== פוטר ===== */
+footer {
+  border-top: 4px solid var(--pink);
+  background: #fff;
+  text-align: center;
+  padding: 18px;
+  font-weight: 800;
+  font-size: 16px;
+  color: #2a2333;
+}
+
+footer .balls { font-size: 20px; letter-spacing: 6px; }
+
+.empty-state {
+  text-align: center;
+  color: #97909f;
+  padding: 30px;
+  font-weight: 600;
+}
+
+@media (max-width: 560px) {
+  table.games { font-size: 13px; }
+  table.games thead th { font-size: 12px; padding: 8px 4px; }
+  table.games tbody td { padding: 8px 4px; }
+  .score-input { width: 42px; }
+}
