@@ -2,3 +2,5 @@ node_modules/
 .vercel/
 .env*
 .dev-redis.json
+.vercel
+.env*.local

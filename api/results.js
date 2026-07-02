@@ -5,7 +5,11 @@ import { Redis } from '@upstash/redis';
 const KEY = 'krl:results';
 
 export default async function handler(req, res) {
-  const redis = Redis.fromEnv();
+  // בפריסת Vercel האינטגרציה מזריקה KV_REST_API_*; בפיתוח מקומי משתמשים ב-UPSTASH_REDIS_REST_*
+  const redis = new Redis({
+    url: process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN
+  });
 
   if (req.method === 'GET') {
     const data = await redis.get(KEY);
