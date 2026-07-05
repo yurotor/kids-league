@@ -21,6 +21,7 @@
     </div>
     <nav class="nav-links">
       <a href="index.html">לוח משחקים</a>
+      <a href="scorers.html">👑 מלך השערים</a>
       <a href="data/policy/תקנון ליגת ראש העיר בכדורגל 2026.docx" download>📄 תקנון</a>
       <a href="https://forms.gle/qXMrvuR7spZGBroM6" target="_blank" rel="noopener">🩺 הצהרת בריאות</a>
       <a href="admin.html" class="admin-link active">ניהול תוצאות</a>
@@ -43,20 +44,19 @@
 
   <!-- מסך ניהול -->
   <main id="adminView" class="wrap" style="display:none">
-    <h2 class="hero-title">ניהול תוצאות</h2>
+    <h2 class="hero-title">ניהול משחקים</h2>
     <div class="hero-sub-holder">
-      <span class="hero-sub">עדכון תוצאות משחקים — שלב הבתים</span>
+      <span class="hero-sub">התחלת משחק ← עדכון שערים וכובשים בזמן אמת ← סיום</span>
     </div>
 
     <div class="admin-toolbar">
-      <button class="btn btn-primary" id="saveBtn">💾 שמירת שינויים</button>
+      <span class="save-note">💾 כל פעולה נשמרת אוטומטית ומוצגת מיידית לכל הגולשים</span>
       <span class="spacer"></span>
-      <span class="save-note">שמירה מעדכנת את התוצאות לכל הגולשים</span>
       <button class="btn btn-ghost btn-sm" id="logoutBtn">התנתקות</button>
     </div>
 
     <div class="class-picker">
-      <h2>בחרו כיתה לעדכון תוצאות</h2>
+      <h2>בחרו כיתה לניהול המשחקים</h2>
       <div class="class-chips" id="classChips"></div>
     </div>
 
@@ -71,6 +71,7 @@
   </footer>
 
   <script src="js/data.js"></script>
+  <script src="js/players.js"></script>
   <script src="js/app.js"></script>
   <script src="js/admin.js"></script>
 </body>

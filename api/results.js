@@ -27,10 +27,27 @@ export default async function handler(req, res) {
     if (!body || typeof body !== 'object' || Array.isArray(body)) {
       return res.status(400).json({ error: 'expected results object' });
     }
-    // מבנה תקין: { gameId: {h: number, a: number}, ... }
+    // מבנה תקין: { gameId: { h, a, st?: "L"|"E", goals?: [{side:"h"|"a", player:string|null}], startedAt?: string } }
     for (const [id, r] of Object.entries(body)) {
       if (!r || typeof r.h !== 'number' || typeof r.a !== 'number' || r.h < 0 || r.a < 0) {
         return res.status(400).json({ error: `invalid result for ${id}` });
+      }
+      if (r.st !== undefined && r.st !== 'L' && r.st !== 'E') {
+        return res.status(400).json({ error: `invalid state for ${id}` });
+      }
+      if (r.startedAt !== undefined && r.startedAt !== null && typeof r.startedAt !== 'string') {
+        return res.status(400).json({ error: `invalid startedAt for ${id}` });
+      }
+      if (r.goals !== undefined) {
+        if (!Array.isArray(r.goals)) {
+          return res.status(400).json({ error: `invalid goals for ${id}` });
+        }
+        for (const g of r.goals) {
+          if (!g || (g.side !== 'h' && g.side !== 'a') ||
+              (g.player !== null && typeof g.player !== 'string')) {
+            return res.status(400).json({ error: `invalid goal entry for ${id}` });
+          }
+        }
       }
     }
 

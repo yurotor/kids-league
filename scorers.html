@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ליגת ראש העיר 2026 — לוח משחקים</title>
+  <title>ליגת ראש העיר 2026 — מלך השערים</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -20,8 +20,8 @@
       </div>
     </div>
     <nav class="nav-links">
-      <a href="index.html" class="active">לוח משחקים</a>
-      <a href="scorers.html">👑 מלך השערים</a>
+      <a href="index.html">לוח משחקים</a>
+      <a href="scorers.html" class="active">👑 מלך השערים</a>
       <a href="data/policy/תקנון ליגת ראש העיר בכדורגל 2026.docx" download>📄 תקנון</a>
       <a href="https://forms.gle/qXMrvuR7spZGBroM6" target="_blank" rel="noopener">🩺 הצהרת בריאות</a>
       <a href="admin.html" class="admin-link">ניהול תוצאות</a>
@@ -29,37 +29,17 @@
   </header>
 
   <main class="wrap">
-    <h2 class="hero-title">לו"ז משחקים</h2>
+    <h2 class="hero-title">👑 מלך השערים</h2>
     <div class="hero-sub-holder">
-      <span class="hero-sub">שלב הבתים | מגרש אורט דרום</span>
+      <span class="hero-sub">טבלת הכובשים של הליגה</span>
     </div>
-
-    <div class="calendar-strip" id="calendar"></div>
 
     <div class="class-picker">
-      <h2>בחרו כיתה להצגת לוח המשחקים והטבלאות</h2>
-      <div class="class-chips" id="classChips"></div>
-      <div class="filters-row">
-        <div class="filter">
-          <label for="roundFilter">מחזור / שלב</label>
-          <select id="roundFilter"></select>
-        </div>
-        <div class="filter">
-          <label for="teamFilter">קבוצה</label>
-          <select id="teamFilter"></select>
-        </div>
-        <div class="filter filter-live">
-          <label>שידור חי</label>
-          <button id="liveToggle" class="chip live-toggle" type="button"></button>
-        </div>
-      </div>
+      <h2>בחרו תצוגה: כל הליגה או כיתה מסוימת</h2>
+      <div class="class-chips" id="scopeChips"></div>
     </div>
 
-    <h2 class="section-title" id="scheduleTitle">🗓️ לוח משחקים</h2>
-    <div id="schedule"></div>
-
-    <h2 class="section-title">🏆 טבלאות הבתים</h2>
-    <div class="tables-grid" id="tables"></div>
+    <div id="scorersTable"></div>
   </main>
 
   <footer>
@@ -70,6 +50,6 @@
   <script src="js/data.js"></script>
   <script src="js/players.js"></script>
   <script src="js/app.js"></script>
-  <script>initSchedulePage();</script>
+  <script src="js/scorers.js"></script>
 </body>
 </html>
