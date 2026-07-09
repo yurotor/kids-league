@@ -38,6 +38,14 @@ export default async function handler(req, res) {
       if (r.startedAt !== undefined && r.startedAt !== null && typeof r.startedAt !== 'string') {
         return res.status(400).json({ error: `invalid startedAt for ${id}` });
       }
+      if (r.ph !== undefined && r.ph !== null && r.ph !== '1' && r.ph !== 'HT' && r.ph !== '2') {
+        return res.status(400).json({ error: `invalid ph for ${id}` });
+      }
+      for (const f of ['h1EndedAt', 'h2StartedAt', 'endedAt']) {
+        if (r[f] !== undefined && r[f] !== null && typeof r[f] !== 'string') {
+          return res.status(400).json({ error: `invalid ${f} for ${id}` });
+        }
+      }
       if (r.goals !== undefined) {
         if (!Array.isArray(r.goals)) {
           return res.status(400).json({ error: `invalid goals for ${id}` });

@@ -53,15 +53,18 @@ function goalChips(g, r) {
 function stateCellHtml(r) {
   if (!r) return `<span class="pending">טרם שוחק</span>`;
   if (r.st === "L") {
-    const started = r.startedAt ? ` <small class="live-meta">מ־${fmtStartTime(r.startedAt)}</small>` : "";
-    return `<span class="live-badge">● חי</span> ${scorePillHtml(r, " live")}${started}`;
+    return `${liveBadgeHtml(r)} ${scorePillHtml(r, " live")} ${gameClockHtml(r)}`;
   }
   return `${scorePillHtml(r)} <small class="ended-tag">הסתיים</small>`;
 }
 
 function actionsCellHtml(r) {
   if (!r) return `<button class="btn btn-primary btn-sm" data-act="start">▶ התחלת משחק</button>`;
-  if (r.st === "L") return `<button class="btn btn-dark btn-sm" data-act="end">🏁 סיום משחק</button>`;
+  if (r.st === "L") {
+    if (r.ph === "1")  return `<button class="btn btn-dark btn-sm" data-act="endH1">⏸ סיום מחצית ראשונה</button>`;
+    if (r.ph === "HT") return `<button class="btn btn-primary btn-sm" data-act="startH2">▶ התחלת מחצית שנייה</button>`;
+    return `<button class="btn btn-dark btn-sm" data-act="end">🏁 סיום משחק</button>`; // ph "2"
+  }
   return `
     <button class="btn btn-ghost btn-sm" data-act="reopen">↩ חזרה לחי</button>
     <button class="btn btn-ghost btn-sm danger" data-act="reset">🗑 איפוס</button>`;
@@ -121,6 +124,8 @@ function renderAdminSchedule() {
       </div>`;
   }).join("");
   el.innerHTML = cards || `<div class="empty-state">אין משחקים לכיתה זו</div>`;
+  updateGameClocks();   // immediate accuracy after render
+  startClockTicker();   // tick live clocks every second
 }
 
 /* ===== פעולות על משחק ===== */
@@ -129,10 +134,25 @@ function applyAction(gameId, act, opts = {}) {
   const r = normResult(adminResults[gameId]);
 
   if (act === "start") {
-    adminResults[gameId] = { st: "L", h: 0, a: 0, goals: [], startedAt: new Date().toISOString() };
-    return "המשחק התחיל — עדכנו שערים בזמן אמת ⚽";
+    adminResults[gameId] = { st: "L", ph: "1", h: 0, a: 0, goals: [], startedAt: new Date().toISOString() };
+    return "המשחק התחיל — מחצית ראשונה ⚽";
   }
   if (!r) return null;
+
+  if (act === "endH1") {
+    if (r.st !== "L" || r.ph !== "1") return null;
+    r.ph = "HT";
+    r.h1EndedAt = new Date().toISOString();
+    adminResults[gameId] = r;
+    return "המחצית הראשונה הסתיימה — מנוחה ⏸";
+  }
+  if (act === "startH2") {
+    if (r.st !== "L" || r.ph !== "HT") return null;
+    r.ph = "2";
+    r.h2StartedAt = new Date().toISOString();
+    adminResults[gameId] = r;
+    return "המחצית השנייה התחילה ▶";
+  }
 
   if (act === "goal") {
     const player = opts.scorer === OG_VALUE ? null : opts.scorer;
@@ -148,15 +168,23 @@ function applyAction(gameId, act, opts = {}) {
     return "השער נמחק והתוצאה עודכנה";
   }
   if (act === "end") {
+    // ניתן לסיים משחק רק לאחר שהתחילה המחצית השנייה
+    if (r.st !== "L" || r.ph !== "2") return null;
     r.st = "E";
+    r.ph = null;
+    r.endedAt = new Date().toISOString();
     adminResults[gameId] = r;
     return `המשחק הסתיים בתוצאה ${r.h} - ${r.a} 🏁`;
   }
   if (act === "reopen") {
+    // חזרה לחי — ממשיכים במחצית שנייה
     r.st = "L";
+    r.ph = "2";
+    r.endedAt = null;
     if (!r.startedAt) r.startedAt = new Date().toISOString();
+    r.h2StartedAt = new Date().toISOString();
     adminResults[gameId] = r;
-    return "המשחק נפתח מחדש לעריכה (חי)";
+    return "המשחק נפתח מחדש לעריכה (מחצית שנייה)";
   }
   if (act === "reset") {
     if (!confirm("לאפס את המשחק? התוצאה והשערים יימחקו לצמיתות.")) return null;

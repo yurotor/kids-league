@@ -44,12 +44,68 @@ function allGames() {
 
 function normResult(r) {
   if (!r || typeof r.h !== "number" || typeof r.a !== "number") return null;
+  const st = r.st === "L" ? "L" : "E";
+  const ph = st === "L" ? (r.ph === "HT" || r.ph === "2" ? r.ph : "1") : null;
   return {
-    st: r.st === "L" ? "L" : "E",
+    st, ph,
     h: r.h, a: r.a,
     goals: Array.isArray(r.goals) ? r.goals : [],
-    startedAt: r.startedAt || null
+    startedAt: r.startedAt || null,
+    h1EndedAt: r.h1EndedAt || null,
+    h2StartedAt: r.h2StartedAt || null,
+    endedAt: r.endedAt || null
   };
+}
+
+/* ===== game clock — resets each half ===== */
+
+function fmtClock(ms) {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+// Clock text from phase + timestamps. `now` is injected so the ticker refreshes each second.
+function clockTextFrom(ph, startIso, h1endIso, h2startIso, now) {
+  const t = (v) => v ? new Date(v).getTime() : null;
+  now = now || Date.now();
+  let label = "מחצית 1", ms = 0, paused = false;
+  if (ph === "HT") {                        // halftime — freeze first-half elapsed
+    const s = t(startIso), e = t(h1endIso);
+    ms = (s != null && e != null) ? e - s : 0;
+    paused = true;
+  } else if (ph === "2") {                   // second half — count from 0 again
+    const s2 = t(h2startIso);
+    ms = s2 != null ? now - s2 : 0;
+    label = "מחצית 2";
+  } else {                                   // first half (default)
+    const s = t(startIso);
+    ms = s != null ? now - s : 0;
+  }
+  return `${paused ? "⏸ " : ""}${label} · ${fmtClock(ms)}`;
+}
+
+// Clock element carrying data-attrs so the ticker can recompute without a full re-render.
+function gameClockHtml(r, extra = "") {
+  if (!r || r.st !== "L") return "";
+  const ph = r.ph || "1";
+  return `<span class="game-clock${extra}" data-ph="${esc(ph)}" data-start="${esc(r.startedAt || "")}"` +
+         ` data-h1end="${esc(r.h1EndedAt || "")}" data-h2start="${esc(r.h2StartedAt || "")}">` +
+         `${esc(clockTextFrom(ph, r.startedAt, r.h1EndedAt, r.h2StartedAt))}</span>`;
+}
+
+function updateGameClocks(root = document) {
+  const now = Date.now();
+  root.querySelectorAll(".game-clock").forEach(el => {
+    el.textContent = clockTextFrom(el.dataset.ph, el.dataset.start, el.dataset.h1end, el.dataset.h2start, now);
+  });
+}
+
+// Tick every second — updates only the clock text, never touches the rest of the DOM.
+function startClockTicker() {
+  if (startClockTicker._id) return;
+  startClockTicker._id = setInterval(() => updateGameClocks(), 1000);
 }
 
 const OWN_GOAL_LABEL = "גול עצמי";
@@ -176,11 +232,18 @@ function scorePillHtml(r, extra = "") {
   return `<span class="score-pill${extra}">${r.a} - ${r.h}</span>`;
 }
 
+// Live badge reflects the phase: pulsing "live" during play, a calm "rest" at halftime.
+function liveBadgeHtml(r) {
+  return r.ph === "HT"
+    ? `<span class="ht-badge">⏸ מנוחה</span>`
+    : `<span class="live-badge">● חי</span>`;
+}
+
 function scoreCell(g, results) {
   const r = normResult(results[g.id]);
   if (!r) return `<span class="pending">טרם שוחק</span>`;
   if (r.st === "L") {
-    return `<span class="live-badge">● חי</span> ${scorePillHtml(r, " live")}`;
+    return `${liveBadgeHtml(r)} ${scorePillHtml(r, " live")} ${gameClockHtml(r)}`;
   }
   return scorePillHtml(r);
 }
@@ -281,7 +344,8 @@ function renderLiveMatches(results) {
     return `
     <div class="live-card">
       <div class="live-card-head">
-        <span class="live-badge">● חי</span>
+        ${liveBadgeHtml(r)}
+        ${gameClockHtml(r, " clock-chip")}
         <span class="cls-tag-dark">כיתה ${esc(g.cls)}</span>
         <span class="live-meta">מחזור ${g.round} | מגרש ${g.pitch}${r.startedAt ? ` | התחיל ב־${fmtStartTime(r.startedAt)}` : ""}</span>
       </div>
@@ -368,6 +432,7 @@ async function initSchedulePage() {
       renderSchedule(cls, results, roundFilter, teamFilter);
     }
     renderTables(cls, results);
+    updateGameClocks();   // immediate accuracy after each render
   };
 
   const pickClass = (c) => {
@@ -378,6 +443,7 @@ async function initSchedulePage() {
   };
 
   refresh();
+  startClockTicker();   // tick live clocks every second
 
   setInterval(async () => {
     try {
