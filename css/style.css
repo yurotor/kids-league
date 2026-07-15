@@ -337,6 +337,30 @@ tr.live-row { box-shadow: inset 4px 0 0 #e02424; }
   box-shadow: 0 2px 6px rgba(224, 36, 36, .12);
 }
 
+/* הזנת תוצאה סופית ידנית — ללא שעון וללא כובשים */
+.quick-result {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.qr-field { display: inline-flex; align-items: center; gap: 4px; }
+.qr-lbl { font-size: 11px; font-weight: 800; color: #8a7fa3; }
+.qr-input {
+  width: 46px;
+  padding: 4px 6px;
+  border: 1.5px solid #e2ddea;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+  direction: ltr;
+}
+.qr-input:focus { outline: none; border-color: #7c5cc4; }
+.qr-sep { font-weight: 900; color: #8a7fa3; }
+
 .scorers {
   display: flex;
   flex-wrap: wrap;

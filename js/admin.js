@@ -59,7 +59,14 @@ function stateCellHtml(r) {
 }
 
 function actionsCellHtml(r) {
-  if (!r) return `<button class="btn btn-primary btn-sm" data-act="start">▶ התחלת משחק</button>`;
+  if (!r) return `
+    <button class="btn btn-primary btn-sm" data-act="start">▶ התחלת משחק</button>
+    <div class="quick-result" title="הזנת תוצאה סופית ידנית — ללא כובשים וללא שעון">
+      <span class="qr-field"><span class="qr-lbl">בית</span><input type="number" class="qr-input" data-side="h" min="0" max="99" value="0" inputmode="numeric" aria-label="שערי הבית"></span>
+      <span class="qr-sep">:</span>
+      <span class="qr-field"><span class="qr-lbl">חוץ</span><input type="number" class="qr-input" data-side="a" min="0" max="99" value="0" inputmode="numeric" aria-label="שערי החוץ"></span>
+      <button class="btn btn-dark btn-sm" data-act="setResult">💾 שמירת תוצאה</button>
+    </div>`;
   if (r.st === "L") {
     if (r.ph === "1")  return `<button class="btn btn-dark btn-sm" data-act="endH1">⏸ סיום מחצית ראשונה</button>`;
     if (r.ph === "HT") return `<button class="btn btn-primary btn-sm" data-act="startH2">▶ התחלת מחצית שנייה</button>`;
@@ -136,6 +143,13 @@ function applyAction(gameId, act, opts = {}) {
   if (act === "start") {
     adminResults[gameId] = { st: "L", ph: "1", h: 0, a: 0, goals: [], startedAt: new Date().toISOString() };
     return "המשחק התחיל — מחצית ראשונה ⚽";
+  }
+  if (act === "setResult") {
+    // תוצאה סופית ידנית — קובע משחק כמסתיים ללא כובשים וללא שעון
+    const clamp = (v) => Number.isFinite(v) ? Math.max(0, Math.min(99, Math.floor(v))) : 0;
+    const h = clamp(opts.h), a = clamp(opts.a);
+    adminResults[gameId] = { st: "E", h, a, goals: [] };
+    return `התוצאה נשמרה: ${h} - ${a} 🏁`;
   }
   if (!r) return null;
 
@@ -233,6 +247,12 @@ function bindAdminActions() {
     if (act === "goal") {
       const sel = tr.querySelector(`.scorer-select[data-side="${opts.side}"]`);
       opts.scorer = sel ? sel.value : OG_VALUE;
+    }
+    if (act === "setResult") {
+      const hIn = tr.querySelector('.qr-input[data-side="h"]');
+      const aIn = tr.querySelector('.qr-input[data-side="a"]');
+      opts.h = hIn ? Number(hIn.value) : 0;
+      opts.a = aIn ? Number(aIn.value) : 0;
     }
 
     const msg = applyAction(gameId, act, opts);
