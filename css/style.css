@@ -337,29 +337,40 @@ tr.live-row { box-shadow: inset 4px 0 0 #e02424; }
   box-shadow: 0 2px 6px rgba(224, 36, 36, .12);
 }
 
-/* הזנת תוצאה סופית ידנית — ללא שעון וללא כובשים */
+/* הזנת תוצאה סופית ידנית — ללא שעון וללא כובשים.
+   כרטיסון קומפקטי שנשאר שורה נקייה אחת גם במסך צר (לא נשבר לערימה). */
 .quick-result {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   margin-top: 6px;
-  flex-wrap: wrap;
+  padding: 5px 8px;
+  background: #f6f3fb;
+  border: 1px solid #e2ddea;
+  border-radius: 10px;
+  white-space: nowrap;
+  max-width: 100%;
 }
 .qr-field { display: inline-flex; align-items: center; gap: 4px; }
 .qr-lbl { font-size: 11px; font-weight: 800; color: #8a7fa3; }
 .qr-input {
-  width: 46px;
-  padding: 4px 6px;
-  border: 1.5px solid #e2ddea;
+  width: 42px;
+  padding: 5px 4px;
+  border: 1.5px solid #d9d2e6;
   border-radius: 8px;
   background: #fff;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
   text-align: center;
   direction: ltr;
+  -moz-appearance: textfield;
 }
+/* הסרת חצי המספר — נקי וקומפקטי יותר */
+.qr-input::-webkit-outer-spin-button,
+.qr-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .qr-input:focus { outline: none; border-color: #7c5cc4; }
 .qr-sep { font-weight: 900; color: #8a7fa3; }
+.qr-save { padding: 5px 10px; margin: 0 !important; }
 
 .scorers {
   display: flex;
@@ -781,4 +792,26 @@ footer .balls { font-size: 20px; letter-spacing: 6px; }
   .live-score { justify-self: center; order: -1; }
   #adminSchedule table.games { table-layout: auto; }
   .actions-cell .btn { font-size: 11.5px; padding: 5px 10px; }
+
+  /* עורך תוצאה ידנית בנייד — כל תווית מעל התיבה שלה כדי שהשדות צרים,
+     שני הניקודים באותה שורה, וכפתור שמירה ברוחב מלא מתחת. עמודה צרה = הטבלה לא נחתכת. */
+  .quick-result {
+    margin-top: 8px;
+    padding: 8px;
+    gap: 6px 10px;
+    flex-wrap: wrap;
+    white-space: normal;
+    justify-content: center;
+  }
+  .quick-result .qr-field { flex-direction: column; gap: 2px; }
+  .quick-result .qr-lbl { font-size: 10px; }
+  .quick-result .qr-input { width: 44px; font-size: 16px; padding: 6px 3px; } /* 16px מונע זום אוטומטי ב-iOS */
+  .quick-result .qr-sep { display: none; }              /* התוויות בית/חוץ מספיקות — אין צורך בנקודתיים */
+  .quick-result .qr-save {
+    flex: 1 0 100%;
+    text-align: center;
+    font-size: 12.5px;
+    padding: 8px;
+    margin: 4px 0 0 !important;
+  }
 }

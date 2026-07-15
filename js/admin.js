@@ -65,7 +65,7 @@ function actionsCellHtml(r) {
       <span class="qr-field"><span class="qr-lbl">בית</span><input type="number" class="qr-input" data-side="h" min="0" max="99" value="0" inputmode="numeric" aria-label="שערי הבית"></span>
       <span class="qr-sep">:</span>
       <span class="qr-field"><span class="qr-lbl">חוץ</span><input type="number" class="qr-input" data-side="a" min="0" max="99" value="0" inputmode="numeric" aria-label="שערי החוץ"></span>
-      <button class="btn btn-dark btn-sm" data-act="setResult">💾 שמירת תוצאה</button>
+      <button class="btn btn-dark btn-sm qr-save" data-act="setResult">💾 שמירה</button>
     </div>`;
   if (r.st === "L") {
     if (r.ph === "1")  return `<button class="btn btn-dark btn-sm" data-act="endH1">⏸ סיום מחצית ראשונה</button>`;
@@ -97,8 +97,30 @@ function livePanelHtml(g, r) {
     </div>`;
 }
 
+/* צילום ערכים שהוקלדו בתיבות "תוצאה ידנית" ועדיין לא נשמרו,
+   כדי שרינדור מחדש (למשל אחרי שמירת משחק אחר) לא יאפס אותם */
+function snapshotQuickResults(el) {
+  const pending = {};
+  el.querySelectorAll('tr[data-game] .qr-input').forEach(inp => {
+    const tr = inp.closest('tr[data-game]');
+    if (!tr) return;
+    (pending[tr.dataset.game] = pending[tr.dataset.game] || {})[inp.dataset.side] = inp.value;
+  });
+  return pending;
+}
+
+function restoreQuickResults(el, pending) {
+  Object.entries(pending).forEach(([gid, sides]) => {
+    Object.entries(sides).forEach(([side, val]) => {
+      const inp = el.querySelector(`tr[data-game="${CSS.escape(gid)}"] .qr-input[data-side="${side}"]`);
+      if (inp) inp.value = val;
+    });
+  });
+}
+
 function renderAdminSchedule() {
   const el = document.getElementById("adminSchedule");
+  const pending = snapshotQuickResults(el); // שמירת ערכים שהוקלדו ולא נשמרו
   const cards = LEAGUE.rounds.map(round => {
     const games = round.games.filter(g => g.cls === adminCls);
     if (!games.length) return "";
@@ -131,6 +153,7 @@ function renderAdminSchedule() {
       </div>`;
   }).join("");
   el.innerHTML = cards || `<div class="empty-state">אין משחקים לכיתה זו</div>`;
+  restoreQuickResults(el, pending); // החזרת ערכים שהוקלדו ולא נשמרו
   updateGameClocks();   // immediate accuracy after render
   startClockTicker();   // tick live clocks every second
 }
@@ -235,6 +258,15 @@ async function autoSave(successMsg) {
 }
 
 function bindAdminActions() {
+  // בחירת כל התוכן בתיבת תוצאה בעת מיקוד — כדי להקליד מיד בלי למחוק את מה שקיים.
+  // דחייה בטיק אחד משפרת אמינות בנייד (iOS), ו-try כי select עלול להיכשל בחלק מהדפדפנים.
+  document.getElementById("adminSchedule").addEventListener("focusin", (e) => {
+    const inp = e.target;
+    if (inp && inp.classList && inp.classList.contains("qr-input")) {
+      setTimeout(() => { try { inp.select(); } catch (_) {} }, 0);
+    }
+  });
+
   document.getElementById("adminSchedule").addEventListener("click", async (e) => {
     const btn = e.target.closest("[data-act]");
     if (!btn) return;
