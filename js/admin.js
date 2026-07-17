@@ -121,8 +121,13 @@ function restoreQuickResults(el, pending) {
 function renderAdminSchedule() {
   const el = document.getElementById("adminSchedule");
   const pending = snapshotQuickResults(el); // שמירת ערכים שהוקלדו ולא נשמרו
-  const cards = LEAGUE.rounds.map(round => {
-    const games = round.games.filter(g => g.cls === adminCls);
+  // שלב הבתים (מחזורים) + שלב הנוקאאוט (רבע גמר) — כולם ניתנים לניהול כאן
+  const stages = [
+    ...LEAGUE.rounds.map(r => ({ label: `מחזור ${r.num}`, day: r.day, date: r.date, venue: r.venue, games: r.games, ko: false })),
+    ...(LEAGUE.knockout || []).map(k => ({ label: k.label, day: k.day, date: k.date, venue: k.venue, games: k.games, ko: true }))
+  ];
+  const cards = stages.map(stage => {
+    const games = stage.games.filter(g => g.cls === adminCls);
     if (!games.length) return "";
     const rows = games.map(g => {
       const r = normResult(adminResults[g.id]);
@@ -141,10 +146,10 @@ function renderAdminSchedule() {
       </tr>${panel}`;
     }).join("");
     return `
-      <div class="round-card">
-        <div class="round-head">
-          <span class="round-name">מחזור ${round.num}</span>
-          <span class="round-meta">${esc(round.day)} | ${esc(round.date)} | ${esc(round.venue)}</span>
+      <div class="round-card${stage.ko ? " knockout-card" : ""}">
+        <div class="round-head${stage.ko ? " knockout-head" : ""}">
+          <span class="round-name">${stage.ko ? "🏆 " : ""}${esc(stage.label)}</span>
+          <span class="round-meta">${esc(stage.day)} | ${esc(stage.date)} | ${esc(stage.venue)}</span>
         </div>
         <table class="games admin-games">
           <thead><tr><th>שעה</th><th>מגרש</th><th>משחק</th><th>מצב</th><th>פעולות</th></tr></thead>

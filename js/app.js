@@ -35,7 +35,10 @@ function getOverlay() {
 }
 
 function allGames() {
-  return LEAGUE.rounds.flatMap(r => r.games.map(g => ({ ...g, round: r.num, date: r.date, day: r.day, venue: r.venue })));
+  const group = LEAGUE.rounds.flatMap(r => r.games.map(g => ({ ...g, round: r.num, date: r.date, day: r.day, venue: r.venue })));
+  // משחקי נוקאאוט (רבע גמר וכו') — מסומנים ב-stage כדי שלא ייספרו בטבלאות הבתים
+  const ko = (LEAGUE.knockout || []).flatMap(k => k.games.map(g => ({ ...g, stage: k.stage, stageLabel: k.label, date: k.date, day: k.day, venue: k.venue })));
+  return [...group, ...ko];
 }
 
 /* ===== מצב משחק ושערים =====
@@ -176,6 +179,7 @@ function computeStandings(cls, teams, results) {
 
   allGames().forEach(g => {
     if (g.cls !== cls) return;
+    if (g.stage) return; // משחקי נוקאאוט אינם נספרים בטבלת הבתים
     const r = normResult(results[g.id]);
     if (!r || r.st !== "E") return; // רק משחקים שהסתיימו נספרים בטבלה
     if (!(g.home in rows) || !(g.away in rows)) return; // משחק בין־ביתי לא נספר בטבלה
@@ -257,19 +261,26 @@ function knockoutStages() {
 function renderRoundFilter(selected, onChange) {
   const el = document.getElementById("roundFilter");
   if (!el) return;
+  // הדרופדאון מציג מחזורי שלב הבתים בלבד; רבע הגמר מוצג בלשונית נפרדת
   const opts = [`<option value="all">כל המחזורים</option>`];
   LEAGUE.rounds.forEach(r => opts.push(`<option value="r${r.num}">מחזור ${r.num} — ${esc(r.date)}</option>`));
-  knockoutStages().forEach((k, i) => opts.push(`<option value="k${i}">${esc(k.label)} — ${esc(k.date)}</option>`));
   el.innerHTML = opts.join("");
   el.value = selected;
   el.onchange = () => onChange(el.value);
 }
 
-function renderTeamFilter(cls, selected, onChange) {
+/* הקבוצות המשתתפות ברבע הגמר בכיתה נתונה (לסינון הקבוצה בשלב הנוקאאוט) */
+function knockoutTeams(cls) {
+  const set = new Set();
+  (LEAGUE.knockout || []).forEach(k => k.games.forEach(g => {
+    if (g.cls === cls) { set.add(g.home); set.add(g.away); }
+  }));
+  return [...set];
+}
+
+function renderTeamFilter(teams, selected, onChange) {
   const el = document.getElementById("teamFilter");
   if (!el) return;
-  const teams = Object.values(LEAGUE.groups[cls] || {}).flat()
-    .sort((a, b) => a.localeCompare(b, "he"));
   const opts = [`<option value="all">כל הקבוצות</option>`];
   teams.forEach(t => opts.push(`<option value="${esc(t)}">${esc(t)}</option>`));
   el.innerHTML = opts.join("");
@@ -326,6 +337,40 @@ function renderSchedule(cls, results, roundFilter = "all", teamFilter = "all") {
   el.innerHTML = cards || `<div class="empty-state">אין משחקים מתאימים לסינון שנבחר</div>`;
 }
 
+/* ===== רבע הגמר (שלב הנוקאאוט) ===== */
+function renderKnockout(cls, results, teamFilter = "all") {
+  const el = document.getElementById("schedule");
+  const cards = (LEAGUE.knockout || []).map(stage => {
+    const games = stage.games.filter(g =>
+      g.cls === cls &&
+      (teamFilter === "all" || g.home === teamFilter || g.away === teamFilter));
+    if (!games.length) return "";
+    const rows = games.map(g => {
+      const r = normResult(results[g.id]);
+      const scorers = r ? scorersHtml(r) : "";
+      return `
+      <tr${r && r.st === "L" ? ` class="live-row"` : ""}>
+        <td>${esc(g.time)}</td>
+        <td>${g.pitch}</td>
+        <td class="teams-cell">${esc(g.home)}<span class="vs">נגד</span>${esc(g.away)}${scorers}</td>
+        <td>${scoreCell(g, results)}</td>
+      </tr>`;
+    }).join("");
+    return `
+      <div class="round-card knockout-card">
+        <div class="round-head knockout-head">
+          <span class="round-name">🏆 ${esc(stage.label)}</span>
+          <span class="round-meta">${esc(stage.day)} | ${esc(stage.date)} | ${esc(stage.venue)}</span>
+        </div>
+        <table class="games">
+          <thead><tr><th>שעה</th><th>מגרש</th><th>משחק</th><th>תוצאה</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }).join("");
+  el.innerHTML = cards || `<div class="empty-state">אין משחקי רבע גמר לכיתה זו</div>`;
+}
+
 /* ===== תצוגת משחקים חיים (כל הכיתות) ===== */
 
 function renderLiveMatches(results) {
@@ -347,7 +392,7 @@ function renderLiveMatches(results) {
         ${liveBadgeHtml(r)}
         ${gameClockHtml(r, " clock-chip")}
         <span class="cls-tag-dark">כיתה ${esc(g.cls)}</span>
-        <span class="live-meta">מחזור ${g.round} | מגרש ${g.pitch}${r.startedAt ? ` | התחיל ב־${fmtStartTime(r.startedAt)}` : ""}</span>
+        <span class="live-meta">${g.stage ? esc(g.stageLabel) : "מחזור " + g.round} | מגרש ${g.pitch}${r.startedAt ? ` | התחיל ב־${fmtStartTime(r.startedAt)}` : ""}</span>
       </div>
       <div class="live-card-body">
         <div class="live-team">
@@ -408,6 +453,21 @@ async function initSchedulePage() {
   let roundFilter = "all";
   let teamFilter = "all";
   let liveOnly = false;
+  let stage = "knockout"; // ברירת מחדל: רבע גמר (עמוד הנחיתה)
+
+  const setHidden = (id, hidden) => {
+    const e = document.getElementById(id);
+    if (e) e.style.display = hidden ? "none" : "";
+  };
+
+  const renderStageTabs = () => {
+    const tabs = document.getElementById("stageTabs");
+    if (!tabs) return;
+    tabs.querySelectorAll(".stage-tab").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.stage === stage);
+      btn.onclick = () => { stage = btn.dataset.stage; refresh(); };
+    });
+  };
 
   const renderLiveToggle = () => {
     const btn = document.getElementById("liveToggle");
@@ -419,19 +479,38 @@ async function initSchedulePage() {
   };
 
   const refresh = () => {
+    renderStageTabs();
     renderClassChips(cls, pickClass);
     renderRoundFilter(roundFilter, v => { roundFilter = v; refresh(); });
-    renderTeamFilter(cls, teamFilter, v => { teamFilter = v; refresh(); });
+
+    const knockout = stage === "knockout";
+    // רשימת הקבוצות בסינון תלויה בשלב: ברבע גמר — רק קבוצות שיש להן משחק ברבע הגמר
+    const teamList = (knockout ? knockoutTeams(cls) : Object.values(LEAGUE.groups[cls] || {}).flat())
+      .sort((a, b) => a.localeCompare(b, "he"));
+    if (teamFilter !== "all" && !teamList.includes(teamFilter)) teamFilter = "all";
+    renderTeamFilter(teamList, teamFilter, v => { teamFilter = v; refresh(); });
     renderLiveToggle();
+    // סינון מחזור וטבלאות הבתים רלוונטיים רק לשלב הבתים
+    setHidden("roundFilterWrap", knockout);
+    setHidden("tablesTitle", knockout);
+    setHidden("tables", knockout);
+    const heroSub = document.getElementById("heroSub");
+    if (heroSub) heroSub.textContent = knockout
+      ? "רבע הגמר | מגרש אורט דרום | 19.7.26"
+      : "שלב הבתים | מגרש אורט דרום";
+
     const scheduleTitle = document.getElementById("scheduleTitle");
     if (liveOnly) {
       if (scheduleTitle) scheduleTitle.textContent = "🔴 משחקים חיים עכשיו";
       renderLiveMatches(results);
+    } else if (knockout) {
+      if (scheduleTitle) scheduleTitle.textContent = "🏆 רבע הגמר";
+      renderKnockout(cls, results, teamFilter);
     } else {
       if (scheduleTitle) scheduleTitle.textContent = "🗓️ לוח משחקים";
       renderSchedule(cls, results, roundFilter, teamFilter);
     }
-    renderTables(cls, results);
+    if (!knockout) renderTables(cls, results);
     updateGameClocks();   // immediate accuracy after each render
   };
 

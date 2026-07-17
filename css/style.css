@@ -108,7 +108,42 @@ body {
   border-radius: 10px;
 }
 
-.hero-sub-holder { text-align: center; margin-bottom: 26px; }
+.hero-sub-holder { text-align: center; margin-bottom: 18px; }
+
+/* ===== מתג שלב: רבע גמר / שלב הבתים ===== */
+.stage-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.stage-tab {
+  font-family: inherit;
+  font-size: clamp(15px, 2.4vw, 18px);
+  font-weight: 800;
+  cursor: pointer;
+  padding: 10px 26px;
+  border-radius: 999px;
+  border: 2px solid var(--purple-row-a);
+  background: var(--card);
+  color: var(--purple-dark);
+  transition: transform .12s, box-shadow .12s, background .12s, color .12s;
+}
+.stage-tab:hover { transform: translateY(-2px); border-color: var(--purple-mid); }
+.stage-tab.active {
+  background: linear-gradient(135deg, var(--pink), #b3126b);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(233, 30, 140, .32);
+}
+
+/* ===== כרטיס נוקאאוט (רבע גמר) — הדגשת זהב לבידול משלב הבתים.
+   בוררים דו-מחלקתיים כדי לגבור על .round-head המוגדר בהמשך הקובץ ===== */
+.knockout-card { box-shadow: 0 10px 30px rgba(150, 110, 20, 0.18); }
+.round-head.knockout-head { background: linear-gradient(135deg, #fbe9ad, #f3cf67); }
+.round-head.knockout-head .round-name { color: #6b4e00; }
+.round-head.knockout-head .round-meta { color: #7a5b12; }
 
 /* ===== לו"ז טורניר ===== */
 .calendar-strip {
@@ -745,6 +780,8 @@ footer .balls { font-size: 20px; letter-spacing: 6px; }
   .nav-links a { font-size: 13px; padding: 6px 12px; }
 
   .wrap { padding-top: 16px; }
+  .stage-tabs { gap: 8px; margin-bottom: 18px; }
+  .stage-tab { padding: 9px 18px; font-size: 15px; }
   .chip { font-size: 14px; padding: 8px 16px; }
   .filter { min-width: 100%; max-width: 100%; }
 

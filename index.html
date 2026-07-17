@@ -31,7 +31,12 @@
   <main class="wrap">
     <h2 class="hero-title">לו"ז משחקים</h2>
     <div class="hero-sub-holder">
-      <span class="hero-sub">שלב הבתים | מגרש אורט דרום</span>
+      <span class="hero-sub" id="heroSub">רבע הגמר | מגרש אורט דרום | 19.7.26</span>
+    </div>
+
+    <div class="stage-tabs" id="stageTabs">
+      <button class="stage-tab" type="button" data-stage="knockout">🏆 רבע גמר</button>
+      <button class="stage-tab" type="button" data-stage="groups">🗓️ שלב הבתים</button>
     </div>
 
     <div class="calendar-strip" id="calendar"></div>
@@ -40,8 +45,8 @@
       <h2>בחרו כיתה להצגת לוח המשחקים והטבלאות</h2>
       <div class="class-chips" id="classChips"></div>
       <div class="filters-row">
-        <div class="filter">
-          <label for="roundFilter">מחזור / שלב</label>
+        <div class="filter" id="roundFilterWrap">
+          <label for="roundFilter">מחזור</label>
           <select id="roundFilter"></select>
         </div>
         <div class="filter">
@@ -58,7 +63,7 @@
     <h2 class="section-title" id="scheduleTitle">🗓️ לוח משחקים</h2>
     <div id="schedule"></div>
 
-    <h2 class="section-title">🏆 טבלאות הבתים</h2>
+    <h2 class="section-title" id="tablesTitle">🏆 טבלאות הבתים</h2>
     <div class="tables-grid" id="tables"></div>
   </main>
 
